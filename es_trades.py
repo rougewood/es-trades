@@ -3,6 +3,7 @@ import numpy as np
 from sklearn.preprocessing import MinMaxScaler
 import sys
 from multiprocessing import Pool
+import talib
 
 scaler = MinMaxScaler(feature_range=(0,1))
 
@@ -39,7 +40,10 @@ def create_bars(interval):
     except:
         print("Unexpected error.", sys.exc_info()[0])
         raise
-    
+
+    bars['MACD'],bars['MACDsignal'],bars['MACDhist'] = talib.MACD(np.array(bars['close']),
+                            fastperiod=6, slowperiod=12, signalperiod=9)   
+
     print(interval)
     print(bars)
     return bars
