@@ -46,6 +46,8 @@ def create_bars(interval):
 
     bars["RSI"] = talib.RSI(bars['close'], timeperiod=14)
 
+    bars["ADX"] = talib.ADX(bars['high'], bars['low'], bars['close'])
+
     print(interval)
     print(bars)
     return bars
