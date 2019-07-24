@@ -33,6 +33,7 @@ def create_bars(interval):
 
     bars = clean_dataset(bars)
 
+
     try:
         bars['trans_close'] = scaler.fit_transform(bars[['close']])
         bars['trans_amplitude'] = scaler.fit_transform(bars[['amplitude']])
