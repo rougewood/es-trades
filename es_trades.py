@@ -7,7 +7,7 @@ import talib
 
 scaler = MinMaxScaler(feature_range=(0,1))
 
-df = pd.read_csv("ES_Trades.csv", parse_dates=[['Date','Time']], nrows = 10000)
+df = pd.read_csv("./data/ES_Trades.csv", parse_dates=[['Date','Time']], nrows = 10000)
 
 df = df.set_index(['Date_Time'])
 
@@ -42,14 +42,23 @@ def create_bars(interval):
         raise
 
     bars['MACD'],bars['MACDsignal'],bars['MACDhist'] = talib.MACD(np.array(bars['close']),
-                            fastperiod=6, slowperiod=12, signalperiod=9)   
+                            fastperiod=6, slowperiod=12, signalperiod=9)
+
+    bars['trans_macd'] = scaler.fit_transform(bars[['MACD']])
+    bars['trans_macd_signal'] = scaler.fit_transform(bars[['MACDsignal']])
+    bars['trans_macd_hist'] = scaler.fit_transform(bars[['MACDhist']])
 
     bars["RSI"] = talib.RSI(bars['close'], timeperiod=14)
+    bars['trans_rsi'] = scaler.fit_transform(bars[['RSI']])
 
     bars["ADX"] = talib.ADX(bars['high'], bars['low'], bars['close'])
+    bars['trans_adx'] = scaler.fit_transform(bars[['ADX']])
+
+    trans = bars[['trans_close','trans_amplitude','trans_macd','trans_macd_signal','trans_macd_hist','trans_body','trans_rsi','trans_adx']]
 
     print(interval)
-    print(bars)
+    print(type(bars))
+    print(trans)
     return bars
 
 def clean_dataset(df):
