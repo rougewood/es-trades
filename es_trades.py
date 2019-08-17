@@ -3,6 +3,7 @@ import numpy as np
 from sklearn.preprocessing import MinMaxScaler
 import sys
 from multiprocessing import Pool
+from functions import sigmoid
 import talib
 
 scaler = MinMaxScaler(feature_range=(0,1))
@@ -34,7 +35,9 @@ def create_bars(interval):
     bars = clean_dataset(bars)
 
     try:
-        bars['trans_close'] = scaler.fit_transform(bars[['close']])
+        # bars['trans_close'] = scaler.fit_transform(bars[['close']])
+        bars['trans_close'] = bars['close'].diff()
+        # bars['trans_close'].apply(sigmoid(bars[['trans_close']]))
         bars['trans_amplitude'] = scaler.fit_transform(bars[['amplitude']])
         bars['trans_body'] = scaler.fit_transform(bars[['bar_body']])
     except:
@@ -54,7 +57,7 @@ def create_bars(interval):
     bars["ADX"] = talib.ADX(bars['high'], bars['low'], bars['close'])
     bars['trans_adx'] = scaler.fit_transform(bars[['ADX']])
 
-    trans = bars[['trans_close','trans_amplitude','trans_macd','trans_macd_signal','trans_macd_hist','trans_body','trans_rsi','trans_adx']]
+    trans = bars[['close','trans_close','trans_amplitude','trans_macd','trans_macd_signal','trans_macd_hist','trans_body','trans_rsi','trans_adx']]
 
     print(interval)
     print(type(bars))
