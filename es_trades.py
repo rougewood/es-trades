@@ -36,8 +36,7 @@ def create_bars(interval):
 
     try:
         # bars['trans_close'] = scaler.fit_transform(bars[['close']])
-        bars['trans_close'] = bars['close'].diff()
-        # bars['trans_close'].apply(sigmoid(bars[['trans_close']]))
+        bars['trans_close'] = bars['close'].diff().apply(sigmoid)
         bars['trans_amplitude'] = scaler.fit_transform(bars[['amplitude']])
         bars['trans_body'] = scaler.fit_transform(bars[['bar_body']])
     except:
