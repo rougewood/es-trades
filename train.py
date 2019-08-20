@@ -4,7 +4,7 @@ import sys
 
 if len(sys.argv) != 4:
 	print("Usage: python train.py [stock] [window] [episodes]")
-	exit()
+	sys.exit()
 
 stock_name, input_size, episode_count = sys.argv[1], int(sys.argv[2]), int(sys.argv[3])
 

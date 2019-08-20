@@ -5,7 +5,6 @@ from pandas import DataFrame
 from sklearn.preprocessing import MinMaxScaler
 import sys
 from multiprocessing import Pool
-from functions import sigmoid
 import talib
 
 
@@ -49,11 +48,12 @@ def clean_dataset(df):
 
 
 def create_trans_bars(stockName):
-    df = pd.read_csv("/home/roger/PycharmProjects/es-trades/data/"+stockName+".csv", parse_dates=[['Date']], nrows=10000)
+    df = pd.read_csv("/home/roger/PycharmProjects/es-trades/data/"+stockName+".csv")
     bars: DataFrame = df.set_index(['Date'])
+    print(bars)
 
-    bars['amplitude'] = np.absolute((bars['high']-bars['low'])*np.where(bars['close'] > bars['open'], 1, -1))
-    bars['bar_body'] = bars['close'] - bars['open']
+    bars['amplitude'] = np.absolute((bars['High']-bars['Low'])*np.where(bars['Close'] > bars['Open'], 1, -1))
+    bars['bar_body'] = bars['Close'] - bars['Open']
     print(bars.iloc[:5])
     print(np.mean(bars, axis=0))
 
@@ -62,27 +62,27 @@ def create_trans_bars(stockName):
     scaler: MinMaxScaler = MinMaxScaler(feature_range=(0, 1))
     try:
         # bars['trans_close'] = scaler.fit_transform(bars[['close']])
-        bars['trans_close'] = bars['close'].diff().apply(sigmoid)
+        bars['trans_close'] = bars['Close'].diff().apply(sigmoid)
         bars['trans_amplitude'] = scaler.fit_transform(bars[['amplitude']])
         bars['trans_body'] = scaler.fit_transform(bars[['bar_body']])
     except:
         print("Unexpected error.", sys.exc_info()[0])
         raise
 
-    bars['MACD'],bars['MACDsignal'],bars['MACDhist'] = talib.MACD(np.array(bars['close']), fastperiod=6, slowperiod=12,
+    bars['MACD'],bars['MACDsignal'],bars['MACDhist'] = talib.MACD(np.array(bars['Close']), fastperiod=6, slowperiod=12,
                                                                   signalperiod=9)
 
     bars['trans_macd'] = scaler.fit_transform(bars[['MACD']])
     bars['trans_macd_signal'] = scaler.fit_transform(bars[['MACDsignal']])
     bars['trans_macd_hist'] = scaler.fit_transform(bars[['MACDhist']])
 
-    bars["RSI"] = talib.RSI(bars['close'], timeperiod=14)
+    bars["RSI"] = talib.RSI(bars['Close'], timeperiod=14)
     bars['trans_rsi'] = scaler.fit_transform(bars[['RSI']])
 
-    bars["ADX"] = talib.ADX(bars['high'], bars['low'], bars['close'])
+    bars["ADX"] = talib.ADX(bars['High'], bars['Low'], bars['Close'])
     bars['trans_adx'] = scaler.fit_transform(bars[['ADX']])
 
-    trans = bars[['close', 'trans_close', 'trans_amplitude', 'trans_macd', 'trans_macd_signal', 'trans_macd_hist',
+    trans = bars[['Close', 'trans_close', 'trans_amplitude', 'trans_macd', 'trans_macd_signal', 'trans_macd_hist',
                   'trans_body', 'trans_rsi', 'trans_adx']]
     print(type(bars))
     print(trans)
