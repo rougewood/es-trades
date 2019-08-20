@@ -48,8 +48,8 @@ def clean_dataset(df):
     return df[indices_to_keep].astype(np.float64)
 
 
-def create_bars():
-    df = pd.read_csv("/home/roger/PycharmProjects/es-trades/data/GSPC.csv", parse_dates=[['Date']], nrows=10000)
+def create_trans_bars(stockName):
+    df = pd.read_csv("/home/roger/PycharmProjects/es-trades/data/"+stockName+".csv", parse_dates=[['Date']], nrows=10000)
     bars: DataFrame = df.set_index(['Date'])
 
     bars['amplitude'] = np.absolute((bars['high']-bars['low'])*np.where(bars['close'] > bars['open'], 1, -1))
