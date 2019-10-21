@@ -50,7 +50,7 @@ def clean_dataset(df):
 def create_trans_bars(stockName):
     df = pd.read_csv("/home/roger/PycharmProjects/es-trades/data/"+stockName+".csv")
     bars: DataFrame = df.set_index(['Date'])
-    print(bars)
+    print("bars : ".format(bars))
 
     bars['amplitude'] = np.absolute((bars['High']-bars['Low'])*np.where(bars['Close'] > bars['Open'], 1, -1))
     bars['bar_body'] = bars['Close'] - bars['Open']
@@ -80,10 +80,13 @@ def create_trans_bars(stockName):
     bars['trans_rsi'] = scaler.fit_transform(bars[['RSI']])
 
     bars["ADX"] = talib.ADX(bars['High'], bars['Low'], bars['Close'])
+
     bars['trans_adx'] = scaler.fit_transform(bars[['ADX']])
 
     trans = bars[['Close', 'trans_close', 'trans_amplitude', 'trans_macd', 'trans_macd_signal', 'trans_macd_hist',
                   'trans_body', 'trans_rsi', 'trans_adx']]
-    print(type(bars))
-    print(trans)
-    return bars
+    # print(type(bars))
+    print("trans : {}".format(trans))
+    print(trans.index)
+    # return bars
+    return trans
