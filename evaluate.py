@@ -23,7 +23,7 @@ print("length l = {}".format(l))
 batch_size = 32
 
 # state = getState(data, 0, input_size + 1)
-state = data.iloc[0, 1:]
+state = data.iloc[0:input_size, 1:]
 print("state  =  {}".format(state))
 
 total_profit = 0
@@ -36,19 +36,20 @@ for t in range(l):
 
 	# sit
 	# next_state = getState(data, t + 1, input_size + 1)
-	next_state = data.iloc[t, 1:]
+	next_state = data.iloc[t:t+input_size, 1:]
 	print("next_state :{}".format(next_state))
 	reward = 0
 
 	if action == 1: # buy
-		agent.inventory.append(data.iloc[t, 1:])
-		print ("Buy: " + formatPrice(data.iloc[t, 0]))
+		agent.inventory.append(data.iloc[t:t+input_size, 1:])
+		print ("Buy: " + formatPrice(data.iloc[t:t+input_size, 0]))
 
 	elif action == 2 and len(agent.inventory) > 0: # sell
 		bought_price = agent.inventory.pop(0)
-		reward = max(data.iloc[t, 0] - bought_price, 0)
-		total_profit += data.iloc[t, 0] - bought_price
-		print ("Sell: " + formatPrice(data.iloc[t, 0]) + " | Profit: " + formatPrice(data.iloc[t, 0] - bought_price))
+		profit = data.iloc[t+input_size-1, 0] - bought_price
+		reward = max(profit, 0)
+		total_profit += profit
+		print("Sell: " + formatPrice(data.iloc[t+input_size-1, 0]) + " | Profit: " + profit)
 
 	done = True if t == l - 1 else False
 	agent.memory.append((state, action, reward, next_state, done))

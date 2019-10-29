@@ -27,7 +27,7 @@ class Agent:
 
 	def _model(self):
 		model = Sequential()
-		model.add(Dense(units=64, input_dim=self.state_size, activation="relu"))
+		model.add(Dense(units=64, input_shape=(8,), activation="relu"))
 		model.add(Dense(units=32, activation="relu"))
 		model.add(Dense(units=8, activation="relu"))
 		model.add(Dense(self.action_size, activation="linear"))
@@ -36,10 +36,22 @@ class Agent:
 		return model
 
 	def act(self, state):
+		print(self.epsilon)
+
+		f = open("agent_act.txt", "a")
+
 		if not self.is_eval and np.random.rand() <= self.epsilon:
-			return random.randrange(self.action_size)
+			action = random.randrange(self.action_size)
+			print(" random action " + str(action))
+			f.write(" random action " + str(action))
+			f.write("\n")
+			return action
 
 		options = self.model.predict(state)
+		print("predit action : " + str(np.argmax(options[0])))
+		f.write("predit action : "+ str(np.argmax(options[0])))
+		f.write("\n")
+		f.close()
 		return np.argmax(options[0])
 
 	def expReplay(self, batch_size):
